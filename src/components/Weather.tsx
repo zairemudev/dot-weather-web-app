@@ -140,13 +140,13 @@ function Weather({ city }: { city: string }) {
           <div className="p-4 w-full flex justify-center items-center flex-col gap-2">
             <p className="text-[40px] font-bold">{currentWeather?.city}</p>
             <div className="flex gap-8">
-              <p className="flex items-center gap-2">
+              <p className="flex items-center gap-2 text-gray-500">
                 <span>
                   <CalendarDaysIcon className="w-6" />
                 </span>
                 {currentWeather?.date}
               </p>
-              <p className="flex items-center gap-2">
+              <p className="flex items-center gap-2 text-gray-500">
                 <span>
                   <ClockIcon className="w-6" />
                 </span>
