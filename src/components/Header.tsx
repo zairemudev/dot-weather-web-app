@@ -30,7 +30,7 @@ function Header({ updateDarkMode, updateCity }: Props) {
   return (
     <div className="flex-none w-full h-fit bg-transparent p-4 px-6 flex items-center justify-between gap-6">
       {/* logo */}
-      <h3 className="w-fit flex-none dark:text-amber-50 font-bold text-3xl font-pacifico">
+      <h3 className="w-fit flex-none dark:text-amber-50 font-black text-3xl font-pacifico">
         . W
       </h3>
       {/* search bar */}
