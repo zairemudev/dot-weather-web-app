@@ -33,7 +33,9 @@ type forecastData = {
 };
 
 function Weather({ city }: { city: string }) {
-  const [currentWeather, setCurrentWeather] = useState<WeatherData | null>(null);
+  const [currentWeather, setCurrentWeather] = useState<WeatherData | null>(
+    null
+  );
 
   const [forecastWeather, setForecastWeather] = useState<forecastData | null>(
     null
@@ -94,8 +96,10 @@ function Weather({ city }: { city: string }) {
         tempMax: item.main.temp_max,
         tempMin: item.main.temp_min,
         windSpeed: item.wind.speed,
-        date: moment(item.dt_txt.split(" ")[0]).format("Do MMMM YYYY"),
-        time: moment(item.dt_txt.split(" ")[1]).format("h:mm A"),
+        date: moment().isSame(item.dt_txt, "day")
+          ? "Today"
+          : moment(item.dt_txt).format("D MMMM YYYY"),
+        time: moment(item.dt_txt).format("h:mm a"),
       }));
 
       const availableData = {
@@ -104,8 +108,6 @@ function Weather({ city }: { city: string }) {
         coordLat: data.city.coord.lat,
         list: availableList,
       };
-
-      // console.log("availableData:", availableData);
 
       setForecastWeather(availableData);
     } else {
@@ -123,21 +125,21 @@ function Weather({ city }: { city: string }) {
     enabled: !!city,
   });
 
-  // const forecastWeatherQuery = useQuery({
-  //   queryKey: ["forecastWeather", city],
-  //   queryFn: initForecastWeather,
-  //   enabled: !!city,
-  // });
+  const forecastWeatherQuery = useQuery({
+    queryKey: ["forecastWeather", city],
+    queryFn: initForecastWeather,
+    enabled: !!city,
+  });
 
   // console.log("after initCurrentWeather -> currentWeather:", currentWeather);
-  // console.log("after initForecastWeather -> forecastWeather:", forecastWeather);
+  console.log("after initForecastWeather -> forecastWeather:", forecastWeather);
 
   return (
     <div className="flex-auto w-full h-full text-black dark:text-amber-50 px-6 p-4 grid grid-cols-1 gap-4 overflow-auto">
-      <div className="h-full grid grid-cols-1 grid-rows-5 gap-4 ">
-        <div className="flex flex-col justify-between h-full rounded-lg dark:bg-gray-700/25 border border-gray-100 dark:border-black row-span-3 inset-shadow-sm">
+      <div className="h-full grid grid-cols-1 grid-rows-5 gap-4">
+        <div className="flex flex-col justify-between min-h-fit h-full rounded-lg dark:bg-gray-700/25 border border-gray-100 dark:border-black row-span-3 inset-shadow-sm">
           {/* location date time */}
-          <div className="p-4 w-full flex justify-center items-center flex-col gap-2">
+          <div className="p-4 w-full h-fit flex justify-center items-center flex-col gap-2">
             <p className="text-[40px] font-bold">{currentWeather?.city}</p>
             <div className="flex gap-8">
               <p className="flex items-center gap-2 text-gray-500">
@@ -155,7 +157,7 @@ function Weather({ city }: { city: string }) {
             </div>
           </div>
           {/* weather highlight */}
-          <div className="p-4 flex flex-col w-full h-full justify-center items-center">
+          <div className="p-4 flex flex-col w-full h-fit justify-center items-center">
             <p className="text-[28px]">{currentWeather?.summary}</p>
             <img
               alt="weather icon"
@@ -171,7 +173,7 @@ function Weather({ city }: { city: string }) {
             </div>
           </div>
           {/* weather detail */}
-          <div className="p-4 flex w-full justify-center items-center divide-gray-500">
+          <div className="p-4 flex w-full h-fit justify-center items-center divide-gray-500">
             <div className="flex flex-col w-full justify-center items-center">
               <p className="text-lg">{currentWeather?.humidity}%</p>
               <p className="text-sm text-gray-500">Humidity</p>
@@ -186,7 +188,52 @@ function Weather({ city }: { city: string }) {
             </div>
           </div>
         </div>
-        <div className="h-full rounded-lg dark:bg-gray-700/25 border border-gray-100 dark:border-black row-span-2 inset-shadow-sm"></div>
+        <div className="h-full w-full overflow-hidden flex flex-col gap-4 rounded-lg dark:bg-gray-700/25 border border-gray-100 dark:border-black row-span-2 inset-shadow-sm">
+          <p className="pl-4 pt-4 font-bold text-lg">
+            5 day / 3 hour forecast data
+          </p>
+          <div className="overflow-x-auto h-full flex gap-4 pl-4 pb-4">
+            {/* card */}
+            {forecastWeather?.list.map((item) => (
+              <div className="flex flex-col justify-between gap-2 rounded-lg p-4 border border-gray-100 shadow-sm w-fit min-w-[280px]">
+                {/* location date time */}
+                <div className="w-full h-fit flex justify-center items-center flex-col gap-1">
+                  <p className="text-md font-bold">{item?.date}</p>
+                  <p className="text-sm items-center text-gray-500">
+                    {item?.time}
+                  </p>
+                </div>
+                {/* weather highlight */}
+                <div className="flex flex-col w-full h-fit justify-center items-center">
+                  <p className="text-lg">{item?.summary}</p>
+                  <img
+                    alt="weather icon"
+                    src={`https://openweathermap.org/img/wn/${currentWeather?.icon}@4x.png`}
+                    className="w-28"
+                  />
+                  <div className="flex items-center justify-center gap-4">
+                    <p className="text-lg">{item?.temp} &deg;C</p>
+                  </div>
+                </div>
+                {/* weather detail */}
+                <div className="text-xs flex w-full h-fit justify-center items-center divide-gray-500">
+                  <div className="flex flex-col w-full justify-center items-center">
+                    <p className="">{item?.humidity}%</p>
+                    <p className="text-gray-500">Humidity</p>
+                  </div>
+                  <div className="flex flex-col w-full justify-center items-center">
+                    <p className="">{item?.windSpeed} km/s</p>
+                    <p className="text-gray-500">Wind</p>
+                  </div>
+                  <div className="flex flex-col w-full justify-center items-center">
+                    <p className="">{item?.pressure} mb</p>
+                    <p className="text-gray-500">Pressure</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
